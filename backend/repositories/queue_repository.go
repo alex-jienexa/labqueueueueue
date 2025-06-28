@@ -91,7 +91,7 @@ func (r *queueRepository) GetEntries(queueID int) ([]models.QueueEntry, error) {
 
 // Вставляет уже существующий элемент очереди в позицию position очереди.
 // При этом, меняет позиции ВСЕХ элементов после position на +1
-func (r *queueRepository) ForceMove(queueEntry *models.QueueEntry, position int) error {
+func (r *queueRepository) MoveAndPush(queueEntry *models.QueueEntry, position int) error {
 	// Начинаем транзакцию
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -126,4 +126,93 @@ func (r *queueRepository) ForceMove(queueEntry *models.QueueEntry, position int)
 
 	// Фиксируем изменения
 	return tx.Commit()
+}
+
+// Вставляет уже созданный элемент насильно в позицию очереди.
+// Если на данной позиции уже имеются элементы, то все элементы в нём отмечают как конфликтные
+func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) error {
+	// Начинаем транзакцию
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback() // Откатываем в случае ошибки
+
+	// Проверяем занята ли позиция перед изменением
+	isBusy, err := r.IsPositionBusy(entry.QueueID, position)
+	if err != nil {
+		return fmt.Errorf("failed to check position: %w", err)
+	}
+
+	// Вставляем элемент
+	err = tx.QueryRow(`
+		UPDATE queue_entries
+		SET position = $1
+		WHERE id = $2
+		RETURNING position
+	`, position, entry.ID).Scan(&entry.Position)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("queue entry not found")
+		} else {
+			return fmt.Errorf("failed to update queue entry: %w", err)
+		}
+	}
+
+	// Делаем все элементы в позиции конфликтными если до этого в нём были элементы
+	if isBusy {
+		_, err = tx.Exec(`
+			UPDATE queue_entries
+			SET is_conflict = TRUE
+			WHERE queue_id = $1 AND position = $2
+		`, entry.QueueID, entry.Position)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return fmt.Errorf("queue entry not found")
+			} else {
+				return fmt.Errorf("failed to update queue entry: %w", err)
+			}
+		}
+	}
+
+	// Фиксируем изменения
+	return tx.Commit()
+}
+
+// Перемещает уже существующий элемент очереди в первую свободную позицию дальше.
+// Используется в разрешении конфликтных ситуаций
+func (r *queueRepository) MoveToFree(entry *models.QueueEntry) error {
+	if !entry.IsConflict {
+		// Элемент не конфликтный
+		// Todo: стоит ли что-то делать?
+	}
+
+	entries, err := r.GetEntries(entry.QueueID)
+	for _, element := range entries {
+		if element.Position > entry.Position {
+			// Проверяем позицию следующую за element
+			isBisy, err := r.IsPositionBusy(entry.ID, element.Position+1)
+			if err != nil {
+				return fmt.Errorf("failed to check position: %w", err)
+			}
+			if !isBisy {
+				// Позиция свободна, туда вставляем элемент
+				r.MoveForce(entry, element.Position+1)
+			}
+		}
+	}
+
+	return err
+}
+
+// Проверяет, занята ли позиция position в очереди queueID.
+func (r *queueRepository) IsPositionBusy(queueID int, position int) (bool, error) {
+	var isBusy bool
+	err := r.db.QueryRow(`
+		SELECT EXISTS (
+			SELECT 1 FROM queue_entries
+			WHERE queue_id = $1 AND position = $2
+		)`, queueID, position).Scan(&isBusy)
+
+	return isBusy, err
 }

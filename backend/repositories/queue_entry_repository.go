@@ -6,15 +6,15 @@ import (
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
 
-type QueueEntryRepository struct {
+type queueEntryRepository struct {
 	db *sql.DB
 }
 
-func NewQueueEntryRepository(db *sql.DB) *QueueEntryRepository {
-	return &QueueEntryRepository{db: db}
+func NewQueueEntryRepository(db *sql.DB) QueueEntryRepository {
+	return &queueEntryRepository{db: db}
 }
 
-func (r *QueueEntryRepository) Create(queueEntry *models.QueueEntry) error {
+func (r *queueEntryRepository) Create(queueEntry *models.QueueEntry) error {
 	query := `
 		INSERT INTO queues (queue_id, student_id, position, is_conflict, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -32,7 +32,7 @@ func (r *QueueEntryRepository) Create(queueEntry *models.QueueEntry) error {
 }
 
 // Получение позиции в очереди по его ID
-func (r *QueueEntryRepository) GetByID(id int) (*models.QueueEntry, error) {
+func (r *queueEntryRepository) GetByID(id int) (*models.QueueEntry, error) {
 	query := `
 		SELECT id, queue_id, student_id, position, is_conflict, created_at
 		FROM queues

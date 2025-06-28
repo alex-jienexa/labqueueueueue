@@ -6,16 +6,16 @@ import (
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
 
-type QueueRepository struct {
+type queueRepository struct {
 	db *sql.DB
 }
 
-func NewQueueRepository(db *sql.DB) *QueueRepository {
-	return &QueueRepository{db: db}
+func NewQueueRepository(db *sql.DB) QueueRepository {
+	return &queueRepository{db: db}
 }
 
 // Создание новой очереди из модели models.Queue
-func (r *QueueRepository) Create(queue *models.Queue) error {
+func (r *queueRepository) Create(queue *models.Queue) error {
 	query := `
 		INSERT INTO queues (admin_id, title, is_active, starts_at, ends_at, conflict_resolution_method)
 		VALUES ($1, $2, $3, $4, $5, $6)
@@ -34,7 +34,7 @@ func (r *QueueRepository) Create(queue *models.Queue) error {
 }
 
 // Возврат активной очереди
-func (r *QueueRepository) GetActive() (*models.Queue, error) {
+func (r *queueRepository) GetActive() (*models.Queue, error) {
 	query := `
 		SELECT id, admin_id, title, is_active, starts_at, ends_at, conflict_resolution_method, created_at
 		FROM queues
@@ -56,7 +56,7 @@ func (r *QueueRepository) GetActive() (*models.Queue, error) {
 }
 
 // Получение всех записей в очередь QueueEntry для очереди Queue с ID `queueID`
-func (r *QueueRepository) GetEntries(queueID int) ([]models.QueueEntry, error) {
+func (r *queueRepository) GetEntries(queueID int) ([]models.QueueEntry, error) {
 	query := `
 		SELECT id, queue_id, student_id, position, is_conflict, created_at
 		FROM queue_entries

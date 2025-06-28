@@ -37,6 +37,10 @@ type QueueRepository interface {
 
 	// Проверяет, занята ли позиция position в очереди queueID.
 	IsPositionBusy(queueID int, position int) (bool, error)
+	// Перепроверяет все элементы очереди и назначает IsActive = true для тех,
+	// у которых начинается время записи. Ровно и наоборот, если время записи уже
+	// закончилось, ставит IsActive как false
+	ManageActive() error
 }
 
 type QueueEntryRepository interface {

@@ -70,3 +70,23 @@ func CreateQueue(c *gin.Context, queueRepo repositories.QueueRepository, studRep
 		"queue":   queue,
 	})
 }
+
+func GetActiveQueue(c *gin.Context, queueRepo repositories.QueueRepository) {
+	queue, err := queueRepo.GetActive()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Ошибка при получении активной очереди",
+		})
+		return
+	} else if queue == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "На данный момент нет активных очередей",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"queue": queue,
+	})
+}

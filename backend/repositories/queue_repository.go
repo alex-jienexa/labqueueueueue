@@ -36,6 +36,9 @@ func (r *queueRepository) Create(queue *models.Queue) error {
 
 // Возврат активной очереди
 func (r *queueRepository) GetActive() (*models.Queue, error) {
+	// Обновляем активность очередей вне очереди
+	r.ManageActive()
+
 	query := `
 		SELECT id, admin_id, title, is_active, starts_at, ends_at, conflict_resolution_method, created_at
 		FROM queues
@@ -238,4 +241,35 @@ func (r *queueRepository) MoveAndFree(entry *models.QueueEntry, position int) er
 			return r.MoveForce(entry, position)
 		}
 	}
+}
+
+// Перепроверяет все элементы очереди и назначает IsActive = true для тех,
+// у которых начинается время записи. Ровно и наоборот, если время записи уже
+// закончилось, ставит IsActive как false
+func (r *queueRepository) ManageActive() error {
+	// Начнём транзакцию
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to start transaction: %w", err)
+	}
+
+	// Изменяем те очереди, чьё время настало
+	if _, err := tx.Exec(`
+		UPDATE queue_entries
+		SET is_active = TRUE
+		WHERE start_time <= NOW()
+	`); err != nil {
+		return fmt.Errorf("failed to update queue entries: %w", err)
+	}
+
+	// Изменяем те очереди, чьё время уже ушло
+	if _, err := tx.Exec(`
+		UPDATE queue_entries
+		SET is_active = FALSE
+		WHERE end_time <= NOW()
+	`); err != nil {
+		return fmt.Errorf("failed to update queue entries: %w", err)
+	}
+
+	return tx.Commit()
 }

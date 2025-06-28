@@ -13,24 +13,24 @@ import (
 func Register(c *gin.Context, repo repositories.StudentRepository) {
 	var student models.Student
 	if err := c.ShouldBindJSON(&student); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request!!"})
 		return
 	}
 
 	// Хешируем пароль
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(student.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при хешировании пароля: " + err.Error()})
 		return
 	}
 	student.Password = string(hashedPassword)
 
 	if err := repo.Create(&student); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания пользователя: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Register success", "student": student})
+	c.JSON(http.StatusOK, gin.H{"message": "Регистрация успешна", "student": student})
 }
 
 func Login(c *gin.Context, repo repositories.StudentRepository) {

@@ -197,7 +197,7 @@ func (r *queueRepository) MoveToFree(entry *models.QueueEntry) error {
 			}
 			if !isBisy {
 				// Позиция свободна, туда вставляем элемент
-				r.MoveForce(entry, element.Position+1)
+				return r.MoveForce(entry, element.Position+1)
 			}
 		}
 	}
@@ -215,4 +215,27 @@ func (r *queueRepository) IsPositionBusy(queueID int, position int) (bool, error
 		)`, queueID, position).Scan(&isBusy)
 
 	return isBusy, err
+}
+
+// Перемещает элемент в заданную позицию position очереди.
+// Если в данной позиции уже имеется элемент, то он становится прямо за ним.
+func (r *queueRepository) MoveAndFree(entry *models.QueueEntry, position int) error {
+	if entry.Position == position {
+		// Позиция не изменилась
+		return nil
+	} else {
+		// Позиция изменилась
+		// Проверяем занята ли позиция перед изменением
+		if isBusy, err := r.IsPositionBusy(entry.QueueID, position); err != nil {
+			return fmt.Errorf("failed to check position: %w", err)
+		} else if isBusy {
+			// Позиция занята
+			// Пытаемся переместить элемент в следующую позицию
+			return r.MoveAndFree(entry, position+1)
+		} else {
+			// Позиция свободна
+			// Перемещаем элемент в свободную позицию
+			return r.MoveForce(entry, position)
+		}
+	}
 }

@@ -13,6 +13,9 @@ var secretKey []byte
 func GetSecretKey() []byte {
 	if secretKey == nil {
 		godotenv.Load()
+		if os.Getenv("JWT_SECRET") == "" {
+			secretKey = []byte("not-so-secret-key")
+		}
 		secretKey = []byte(os.Getenv("JWT_SECRET"))
 		return secretKey
 	} else {

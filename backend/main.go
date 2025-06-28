@@ -18,6 +18,7 @@ func main() {
 
 	// Загружаем все репозитории
 	studentRepo := repositories.NewStudentRepository(db)
+	queueRepo := repositories.NewQueueRepository(db)
 
 	// Читаем порт из .env (по умолчанию 8080)
 	port := os.Getenv("SERVER_PORT")
@@ -41,6 +42,7 @@ func main() {
 	authGroup.Use(middleware.AuthMiddleware())
 	{
 		authGroup.POST("/rping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "rpong :3"}) })
+		authGroup.POST("/queues", func(c *gin.Context) { api.CreateQueue(c, queueRepo, studentRepo) })
 	}
 
 	// Запуск

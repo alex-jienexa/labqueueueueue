@@ -8,6 +8,7 @@ import (
 	"github.com/alex-jienexa/labqueueueueue/database"
 	"github.com/alex-jienexa/labqueueueueue/middleware"
 	"github.com/alex-jienexa/labqueueueueue/repositories"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,15 @@ func main() {
 
 	// Настройка сервера
 	r := gin.Default()
+
+	// Настройка CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

@@ -1,4 +1,4 @@
-module github.com/alex-jienexa/labqueueueueue_backend
+module github.com/alex-jienexa/labqueueueueue
 
 go 1.24.4
 

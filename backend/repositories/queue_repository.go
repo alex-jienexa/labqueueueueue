@@ -181,7 +181,7 @@ func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) erro
 
 // Перемещает уже существующий элемент очереди в первую свободную позицию дальше.
 // Используется в разрешении конфликтных ситуаций
-func (r *queueRepository) MoveToFree(entry *models.QueueEntry) error {
+func (r *queueRepository) MoveToNextFree(entry *models.QueueEntry) error {
 	if !entry.IsConflict {
 		// Элемент не конфликтный
 		// Todo: стоит ли что-то делать?

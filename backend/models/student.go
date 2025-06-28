@@ -1,0 +1,12 @@
+package models
+
+// Student является структурой студента-пользователя системы.
+// Admin = староста, только старосты могут создавать очередь и менять
+// её параметры.
+type Student struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"-"` // Пароль не возвращаем в JSON
+	IsAdmin  bool   `json:"is_admin"`
+}

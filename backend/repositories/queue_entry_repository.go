@@ -31,6 +31,29 @@ func (r *queueEntryRepository) Create(queueEntry *models.QueueEntry) error {
 	return err
 }
 
+// Добавляет элемент в очередь. Позиция элемента зависит от значения queueEntry.Position.
+// Если queueEntry.Position == 0, то элемент добавляется в первый свободный слот очереди
+func (r *queueEntryRepository) AddToQueue(queueEntry *models.QueueEntry, queueRepo queueRepository) error {
+	if queueEntry.Position == 0 {
+		// Позиция не указана, добавляем в конец очереди
+		r.Create(queueEntry)
+		err := queueRepo.MoveToNextFree(queueEntry)
+		if err != nil {
+			return err
+		}
+	}
+	if queueEntry.Position > 0 {
+		// Позиция указана, добавляем в указанную позицию
+		r.Create(queueEntry)
+		err := queueRepo.MoveForce(queueEntry, queueEntry.Position)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Получение позиции в очереди по его ID
 func (r *queueEntryRepository) GetByID(id int) (*models.QueueEntry, error) {
 	query := `

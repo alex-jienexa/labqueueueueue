@@ -4,8 +4,8 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: postgres_chan
-      POSTGRES_PASSWORD: super_cool_password_change_me_on_deploy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: lab_queueueueueue
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -24,8 +24,8 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_USER: postgres_chan
-      DB_PASSWORD: super_cool_password_change_me_on_deploy
+      DB_USER: postgres
+      DB_PASSWORD: postgres
       DB_NAME: lab_queueueueueue
     depends_on:
       postgres:

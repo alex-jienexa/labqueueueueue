@@ -12,4 +12,6 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
 EXPOSE 8080
+# Копируем папку migrations в контейнер
+COPY --from=builder /app/migrations /app/migrations
 CMD ["./main"]

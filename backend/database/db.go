@@ -43,7 +43,7 @@ func InitDB() *sql.DB {
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		user, password, host, port, dbname, sslmode,
 	)
-	Migrate("github.com/alex-jienexa/labqueueueueue/migrations", psqlLink)
+	Migrate("file:///app/migrations", psqlLink)
 
 	// Подключаемся к БД
 	DB, err = sql.Open("postgres", psqlInfo)

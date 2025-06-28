@@ -6,6 +6,7 @@ import (
 
 	"github.com/alex-jienexa/labqueueueueue/api"
 	"github.com/alex-jienexa/labqueueueueue/database"
+	"github.com/alex-jienexa/labqueueueueue/middleware"
 	"github.com/alex-jienexa/labqueueueueue/repositories"
 	"github.com/gin-gonic/gin"
 )
@@ -36,10 +37,11 @@ func main() {
 	r.POST("/login", func(c *gin.Context) { api.Login(c, studentRepo) })
 
 	// Защита роутинга = требуют проверки JWT-токена
-	// authGroup := r.Group("/")
-	// authGroup.Use(api.JWTAuthMiddleware()) {
-	// Вставить защищённые методы
-	// }
+	authGroup := r.Group("/")
+	authGroup.Use(middleware.AuthMiddleware())
+	{
+		authGroup.POST("/rping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "rpong :3"}) })
+	}
 
 	// Запуск
 	log.Printf("Server started on :%s", port)

@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS students
+    DROP COLUMN IF EXISTS username

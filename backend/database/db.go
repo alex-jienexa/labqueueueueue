@@ -18,7 +18,7 @@ import (
 
 var DB *sql.DB
 
-func InitDB() {
+func InitDB() *sql.DB {
 	// Загружаем .env
 	err := godotenv.Load()
 	if err != nil {
@@ -57,6 +57,8 @@ func InitDB() {
 	}
 
 	log.Println("Successfully connected to PostgreSQL!")
+
+	return DB
 }
 
 // Выполняет миграции из директории `migrationsPath` для pgSQL-базы

@@ -4,15 +4,15 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: queue_chan
+      POSTGRES_PASSWORD: queueuser
       POSTGRES_DB: lab_queueueueueue
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "su - postgres", "pg_isready",  "-U queue_chan -d lab_queueueueueue"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -22,10 +22,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_HOST: postgres
+      DB_HOST: "postgres"
       DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_USER: queue_chan
+      DB_PASSWORD: queueuser
       DB_NAME: lab_queueueueueue
     depends_on:
       postgres:

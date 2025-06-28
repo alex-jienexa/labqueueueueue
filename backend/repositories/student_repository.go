@@ -6,16 +6,16 @@ import (
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
 
-type StudentRepository struct {
+type studentRepository struct {
 	db *sql.DB
 }
 
-func NewStudentRepository(db *sql.DB) *StudentRepository {
-	return &StudentRepository{db: db}
+func NewStudentRepository(db *sql.DB) StudentRepository {
+	return &studentRepository{db: db}
 }
 
 // Добавление нового пользователя в базу данных
-func (r *StudentRepository) Create(student *models.Student) error {
+func (r *studentRepository) Create(student *models.Student) error {
 	query := `
 		INSERT INTO students (name, surname, username, password_hash, is_admin)
 		VALUES ($1, $2, $3, $4)
@@ -34,7 +34,7 @@ func (r *StudentRepository) Create(student *models.Student) error {
 }
 
 // Получение пользователя по ID
-func (r *StudentRepository) GetByID(id int) (*models.Student, error) {
+func (r *studentRepository) GetByID(id int) (*models.Student, error) {
 	query := `
 		SELECT id, name, surname, username, is_admin
 		FROM students
@@ -52,7 +52,7 @@ func (r *StudentRepository) GetByID(id int) (*models.Student, error) {
 }
 
 // Получение пользователя по username для авторизации
-func (r *StudentRepository) GetByUsername(username string) (*models.Student, error) {
+func (r *studentRepository) GetByUsername(username string) (*models.Student, error) {
 	query := `
 		SELECT id, name, surname, username, password_hash, is_admin 
 		FROM students 
@@ -70,7 +70,7 @@ func (r *StudentRepository) GetByUsername(username string) (*models.Student, err
 }
 
 // Получение пользователя по username но без пароля (для безопаности)
-func (r *StudentRepository) GetByUsernameNoPassword(username string) (*models.Student, error) {
+func (r *studentRepository) GetByUsernameNoPassword(username string) (*models.Student, error) {
 	query := `
 		SELECT id, name, surname, username, is_admin 
 		FROM students 

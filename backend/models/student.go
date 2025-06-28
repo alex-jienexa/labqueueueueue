@@ -6,7 +6,7 @@ package models
 type Student struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
-	Email    string `json:"email"`
+	Surname  string `json:"surname"`
 	Password string `json:"-"` // Пароль не возвращаем в JSON
 	IsAdmin  bool   `json:"is_admin"`
 }

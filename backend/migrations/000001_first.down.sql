@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS queues;
+DROP TABLE IF EXISTS queue_entries;
+DROP TABLE IF EXISTS student_queue_access;
+DROP TABLE IF EXISTS conflicts;
+DROP TABLE IF EXISTS sales;

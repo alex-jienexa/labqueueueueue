@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
@@ -86,4 +87,43 @@ func (r *queueRepository) GetEntries(queueID int) ([]models.QueueEntry, error) {
 		entries = append(entries, entry)
 	}
 	return entries, nil
+}
+
+// Вставляет уже существующий элемент очереди в позицию position очереди.
+// При этом, меняет позиции ВСЕХ элементов после position на +1
+func (r *queueRepository) ForceMove(queueEntry *models.QueueEntry, position int) error {
+	// Начинаем транзакцию
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback() // Откатываем в случае ошибки
+
+	// Сдвиг всего на position+1
+	_, err = tx.Exec(
+		`UPDATE queue_entries
+		SET position = position + 1
+		WHERE queue_id = $1 AND position >= $2
+	`, queueEntry.QueueID, position)
+	if err != nil {
+		return fmt.Errorf("failed to shift queue entries: %w", err)
+	}
+
+	// Перемещение элемента
+	err = tx.QueryRow(`
+		UPDATE queue_entries
+		SET position = $1
+		WHERE id = $2
+		RETURNING position
+	`, position, queueEntry.ID).Scan(&queueEntry.Position)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("queue entry not found")
+		} else {
+			return fmt.Errorf("failed to update queue entry: %w", err)
+		}
+	}
+
+	// Фиксируем изменения
+	return tx.Commit()
 }

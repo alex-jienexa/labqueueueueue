@@ -34,6 +34,40 @@ func (r *queueRepository) Create(queue *models.Queue) error {
 	return err
 }
 
+// Получить все очереди
+func (r *queueRepository) GetAll() ([]models.Queue, error) {
+	query := `
+		SELECT id, admin_id, title, is_active, starts_at, ends_at, conflict_resolution_method, created_at
+		FROM queues
+		ORDER BY id
+	`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entries []models.Queue
+	for rows.Next() {
+		var entry models.Queue
+		err := rows.Scan(
+			&entry.ID,
+			&entry.AdminID,
+			&entry.Title,
+			&entry.IsActive,
+			&entry.StartsAt,
+			&entry.EndsAt,
+			&entry.ResolutionMethod,
+			&entry.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, entry)
+	}
+	return entries, nil
+}
+
 // Возврат активной очереди
 func (r *queueRepository) GetActive() (*models.Queue, error) {
 	// Обновляем активность очередей вне очереди

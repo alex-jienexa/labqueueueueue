@@ -40,11 +40,11 @@ const Login = () => {
                 <div className="form">
                     <div className="handler">
                         <div>Логин</div>
-                        <input type="text" name="username" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
+                        <input type="text" name="username"></input>
                     </div>
                     <div className="handler">
                         <div>Пароль</div>
-                        <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^\w\s]).{6,}"></input>
+                        <input type="password" name="password"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
                     </div>
                     <button onClick={clickLogin}> Войти </button>

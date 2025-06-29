@@ -14,6 +14,7 @@ export async function clickLogin(){
         data[element.name] = element.value;
 
     };
+    console.log(data);
     await postLogin(JSON.stringify(data));
 }
 
@@ -37,11 +38,7 @@ export async function clickAuthorize(){
         }
     };
 
-    try{
-        await postAuthorize(JSON.stringify(data));
-    }
-    catch(error){
-
-    }
+    await postAuthorize(JSON.stringify(data));
     
+
 }

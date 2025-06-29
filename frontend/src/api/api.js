@@ -27,6 +27,8 @@ export async function postAuthorize(data) {
     }}).then(response => {
         const cResponce = response.data;
 
+        console.log(response);
+
         return cResponce.message;
 
     });

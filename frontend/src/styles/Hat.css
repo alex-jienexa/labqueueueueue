@@ -26,3 +26,8 @@ nav .exit{
 nav + *{
     padding: 10px 0px; 
 }
+
+img{
+    height: 50px;
+    width: 50px;
+}

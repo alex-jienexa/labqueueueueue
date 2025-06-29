@@ -3,9 +3,10 @@
     align-items: center;
     flex-direction: column;
     flex-flow: column;
-    margin: 50px;
+    margin: 10vh auto;
     background: rgba(75, 6, 66, 0.8);
     border-radius: 1em;
+    width: 80vh;
 }
 
 

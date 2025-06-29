@@ -1,4 +1,45 @@
 #HomePage{
     display: grid;
-    grid-template-columns: 2fr 5fr;
+    grid-template-columns: 4fr 5fr;
+    width: max-content;
+    height: max-content;
+}
+
+#homeNavigation{
+    border-right: 5px solid rgb(92, 3, 92);
+    height: 80vh;
+}
+
+ul {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Добавляем для обтекания */
+}
+
+
+#homeNavigation li{
+    margin: 20px, 15px;
+    padding: 15px 10px;
+    border-bottom: 2px solid rgb(92, 3, 92);
+}
+
+li > *{
+    text-decoration: none;
+
+    padding: 5px;
+}
+
+li > *:hover{
+    color: rgb(92, 3, 92)
+} 
+
+.queue{
+    margin: 25px 15px;
+    background: rgb(70, 70, 70);
+    width: max-content;
+    border-radius: 15px;
+    padding: 10px;
 }

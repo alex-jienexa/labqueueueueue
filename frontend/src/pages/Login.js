@@ -59,7 +59,7 @@ const Login = () => {
                     </div>
                     <div className="handler">
                         <div>Пароль</div>
-                        <input type="password" name="password"></input>
+                        <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^\w\s]).{6,}"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
                     </div>
                     <button onClick={handleSubmit}> Войти </button>

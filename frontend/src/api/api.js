@@ -1,14 +1,15 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 
-const BASE_API_URL = "http://localhost:8080"; 
+export const BASE_API_URL = "http://localhost:8080"; 
 
-const BREAKPOINTS = {
+export const BREAKPOINTS = {
     PING: "/ping",
     JPING: "/rping",
     LOGIN: "/login",
     REGISTER: "/register",
     ACTIVE_QUEUES: "/queues/active",
+    QUEUES: "/queues"
 }
 
 export const fetchCurriencies = async () => {
@@ -48,9 +49,7 @@ export async function postAuthorize(data) {
     }}).then(response => {
         const cResponce = response.data;
 
-        console.log(response);
-
-        return cResponce.message;
+        console.log(cResponce);
 
     });
 }

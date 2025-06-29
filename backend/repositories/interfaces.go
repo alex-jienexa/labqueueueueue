@@ -42,6 +42,8 @@ type QueueRepository interface {
 type QueueEntryRepository interface {
 	// Создание нового элемента очереди в БД
 	Create(queueEntry *models.QueueEntry) error
+	// Обновить конфликтные ситуации для этого объекта и для других объектах данной позиции
+	UpdateConflict(queueEntry *models.QueueEntry) error
 
 	// Получение позиции в очереди по его ID
 	GetByID(id int) (*models.QueueEntry, error)

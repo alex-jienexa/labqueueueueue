@@ -20,6 +20,7 @@ func main() {
 	// Загружаем все репозитории
 	studentRepo := repositories.NewStudentRepository(db)
 	queueRepo := repositories.NewQueueRepository(db)
+	queueEntryRepo := repositories.NewQueueEntryRepository(db)
 
 	// Читаем порт из .env (по умолчанию 8080)
 	port := os.Getenv("SERVER_PORT")
@@ -56,6 +57,7 @@ func main() {
 		authGroup.GET("/queues", func(c *gin.Context) { api.GetAllQueues(c, queueRepo) })
 		authGroup.GET("/queues/active", func(c *gin.Context) { api.GetActiveQueue(c, queueRepo) })
 		authGroup.GET("/queues/:id", func(c *gin.Context) { api.GetQueueByID(c, queueRepo) })
+		authGroup.PUT("/queues/:id", func(c *gin.Context) { api.JoinQueue(c, queueRepo, studentRepo, queueEntryRepo) })
 	}
 
 	// Запуск

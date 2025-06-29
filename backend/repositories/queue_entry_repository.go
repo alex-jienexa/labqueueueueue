@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
@@ -16,8 +17,8 @@ func NewQueueEntryRepository(db *sql.DB) QueueEntryRepository {
 
 func (r *queueEntryRepository) Create(queueEntry *models.QueueEntry) error {
 	query := `
-		INSERT INTO queues (queue_id, student_id, position, is_conflict, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO queue_entries (queue_id, student_id, position, is_conflict, created_at)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
 	`
 	err := r.db.QueryRow(
@@ -58,7 +59,7 @@ func (r *queueEntryRepository) AddToQueue(queueEntry *models.QueueEntry, queueRe
 func (r *queueEntryRepository) GetByID(id int) (*models.QueueEntry, error) {
 	query := `
 		SELECT id, queue_id, student_id, position, is_conflict, created_at
-		FROM queues
+		FROM queue_entries
 		WHERE id = $1
 	`
 	queueEntry := &models.QueueEntry{}
@@ -72,4 +73,65 @@ func (r *queueEntryRepository) GetByID(id int) (*models.QueueEntry, error) {
 	)
 
 	return queueEntry, err
+}
+
+func (r *queueEntryRepository) UpdateConflict(queueEntry *models.QueueEntry) error {
+	// Выбираем все элементы в позици текущей
+	if queueEntry.Position > 0 {
+		query := `
+			SELECT id, queue_id, student_id, position, is_conflict, created_at
+			FROM queue_entries
+			WHERE position = $1 AND queue_id = $2
+		`
+		rows, err := r.db.Query(
+			query,
+			queueEntry.Position,
+			queueEntry.QueueID,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil
+			}
+			return err
+		}
+		defer rows.Close()
+
+		var countOnPosition int
+		err = r.db.QueryRow(`SELECT COUNT(id) FROM queue_entries WHERE position = $1 AND queue_id = $2`, queueEntry.Position, queueEntry.QueueID).Scan(&countOnPosition)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return nil
+			}
+			return err
+		}
+		isMultiple := countOnPosition > 1
+		queueEntry.IsConflict = isMultiple
+
+		for rows.Next() {
+			var entry models.QueueEntry
+			err = rows.Scan(
+				&entry.ID,
+				&entry.QueueID,
+				&entry.StudentID,
+				&entry.Position,
+				&entry.IsConflict,
+				&entry.CreatedAt,
+			)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					return nil
+				}
+				return err
+			}
+			_, err = r.db.Exec(`UPDATE queue_entries SET is_conflict = $1 WHERE id = $2`, isMultiple, entry.ID)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	err := errors.New("position is not set")
+	return err
 }

@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/alex-jienexa/labqueueueueue/models"
 )
@@ -202,6 +203,8 @@ func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) erro
 		return fmt.Errorf("failed to check position: %w", err)
 	}
 
+	log.Println("Going to move element to position: ", position)
+
 	// Вставляем элемент
 	err = tx.QueryRow(`
 		UPDATE queue_entries
@@ -209,6 +212,9 @@ func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) erro
 		WHERE id = $2
 		RETURNING position
 	`, position, entry.ID).Scan(&entry.Position)
+
+	log.Println("Moved element to position: ", entry.Position)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("queue entry not found")
@@ -224,6 +230,7 @@ func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) erro
 			SET is_conflict = TRUE
 			WHERE queue_id = $1 AND position = $2
 		`, entry.QueueID, entry.Position)
+		entry.IsConflict = true
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("queue entry not found")
@@ -240,16 +247,30 @@ func (r *queueRepository) MoveForce(entry *models.QueueEntry, position int) erro
 // Перемещает уже существующий элемент очереди в первую свободную позицию дальше.
 // Используется в разрешении конфликтных ситуаций
 func (r *queueRepository) MoveToNextFree(entry *models.QueueEntry) error {
-	if !entry.IsConflict {
-		// Элемент не конфликтный
-		// Todo: стоит ли что-то делать?
-	}
+	log.Println("I am in MoveToNextFree")
 
 	entries, err := r.GetEntries(entry.QueueID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("Queue is empty")
+			return r.MoveForce(entry, 1)
+		} else {
+			return fmt.Errorf("failed to get queue entries: %w", err)
+		}
+	}
+	log.Println("Entries: ", entries)
+	if len(entries) == 0 {
+		log.Println("Queue is empty")
+		return r.MoveForce(entry, 1)
+	}
+	var maxPosition int
 	for _, element := range entries {
+		maxPosition = max(maxPosition, element.Position)
 		if element.Position > entry.Position {
 			// Проверяем позицию следующую за element
+			log.Println("Checking position: ", element.Position+1)
 			isBisy, err := r.IsPositionBusy(entry.ID, element.Position+1)
+			log.Println("Is position busy? - ", isBisy)
 			if err != nil {
 				return fmt.Errorf("failed to check position: %w", err)
 			}
@@ -259,8 +280,8 @@ func (r *queueRepository) MoveToNextFree(entry *models.QueueEntry) error {
 			}
 		}
 	}
-
-	return err
+	// Если мы здесь, все элементы в очедеди находятся раньше. Значит, вставим его в конец
+	return r.MoveForce(entry, maxPosition+1)
 }
 
 // Проверяет, занята ли позиция position в очереди queueID.

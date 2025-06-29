@@ -37,6 +37,10 @@ type QueueRepository interface {
 	// у которых начинается время записи. Ровно и наоборот, если время записи уже
 	// закончилось, ставит IsActive как false
 	ManageActive() error
+
+	// Выбирает уступившего/проигравшего в конфликтной ситуации и делает с ним то,
+	// что указано в Queue.resolution_method
+	ResolveConflict(loser *models.QueueEntry, queue *models.Queue) error
 }
 
 type QueueEntryRepository interface {

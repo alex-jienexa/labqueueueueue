@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -348,4 +349,27 @@ func (r *queueRepository) ManageActive() error {
 	}
 
 	return tx.Commit()
+}
+
+func (r *queueRepository) ResolveConflict(loser *models.QueueEntry, queue *models.Queue) error {
+	if !loser.IsConflict {
+		return errors.New("loser is not conflict")
+	}
+
+	switch queue.ResolutionMethod {
+	case "move_after":
+		if err := r.MoveAndPush(loser, loser.Position+1); err != nil {
+			return fmt.Errorf("failed to move and push: %w", err)
+		}
+	case "first_free":
+		if err := r.MoveToNextFree(loser); err != nil {
+			return fmt.Errorf("failed to move to next free: %w", err)
+		}
+	case "to_end":
+		if err := r.MoveAndFree(loser, 1337); err != nil {
+			return fmt.Errorf("failed to move and free: %w", err)
+		}
+	}
+
+	return nil
 }

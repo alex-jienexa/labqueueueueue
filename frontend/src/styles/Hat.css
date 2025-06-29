@@ -1,0 +1,28 @@
+nav{
+    display: grid;
+    grid-template-columns: 10fr 1fr;
+    width: 100%;
+    background: rgb(122, 3, 133);
+}
+nav ul {
+    display: flex;
+    justify-content:space-around;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Добавляем для обтекания */
+}
+
+nav li, nav .exit{
+    float: left; /* Располагаем элементы в ряд */
+    padding: 3px 10px;
+    border-left: 2px dashed rgb(48, 48, 48) ;
+}
+
+nav .exit{
+    float: right;
+}
+
+nav + *{
+    padding: 10px 0px; 
+}

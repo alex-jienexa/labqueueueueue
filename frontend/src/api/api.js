@@ -24,5 +24,10 @@ export async function postLogin(data) {
 export async function postAuthorize(data) {
     await axios.post(BASE_API_URL + BREAKPOINTS.REGISTER, data, {headers: {
         'Content-Type': 'application/json'
-    }}).then(response => {console.log(response)});
+    }}).then(response => {
+        const cResponce = response.data;
+
+        return cResponce.message;
+
+    });
 }

@@ -2,10 +2,12 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    flex-flow: column;
     margin: 50px;
-    background: rgb(75, 6, 66);
+    background: rgba(75, 6, 66, 0.8);
     border-radius: 1em;
 }
+
 
 .RadioHandle{
     display: flex;
@@ -37,7 +39,12 @@ h2{
     width: 50%;
     height: 2.2em;
     border-radius: 20%;
-    background: gray
+    background: gray;
+    border: 0;
+}
+
+button:hover{
+    background: rgb(105, 2, 97);
 }
 
 .handler{

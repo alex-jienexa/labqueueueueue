@@ -13,7 +13,7 @@ import (
 func Register(c *gin.Context, repo repositories.StudentRepository) {
 	var student models.Student
 	if err := c.ShouldBindJSON(&student); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request!!"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request: " + err.Error()})
 		return
 	}
 

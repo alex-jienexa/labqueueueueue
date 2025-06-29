@@ -53,6 +53,7 @@ func main() {
 	{
 		authGroup.POST("/rping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "rpong :3"}) })
 		authGroup.POST("/queues", func(c *gin.Context) { api.CreateQueue(c, queueRepo, studentRepo) })
+		authGroup.GET("/queues/active", func(c *gin.Context) { api.GetActiveQueue(c, queueRepo) })
 	}
 
 	// Запуск

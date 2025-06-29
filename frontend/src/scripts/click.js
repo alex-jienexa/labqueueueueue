@@ -25,14 +25,23 @@ export async function clickAuthorize(){
 
     for (const index in inputs) {
         const element = inputs[index];
+
         if (element.type == "checkbox"){
             data[element.name] = element.checked;
         }
         else if (!element.checkValidity() || element.value == ''){
             return;
         }
-        data[element.name] = element.value;
-
+        else{
+            data[element.name] = element.value;
+        }
     };
-    await postAuthorize(JSON.stringify(data));
+
+    try{
+        await postAuthorize(JSON.stringify(data));
+    }
+    catch(error){
+
+    }
+    
 }

@@ -11,7 +11,7 @@ const Login = () => {
     };
 
     return (
-        <div>
+        <div className="dialog">
             <div className="RadioHandle">
                 <label>
                     <input
@@ -23,7 +23,7 @@ const Login = () => {
                     />
                     Вход
                 </label>
-                <label >
+                <label>
                     <input
                     id="auth_radio"
                     type="radio"
@@ -37,12 +37,12 @@ const Login = () => {
             <div className="LogDialog" id="LogIn">
                 <h2>Войти в систему</h2>
                 
-                <div>
-                    <div>
+                <div className="form">
+                    <div className="handler">
                         <div>Логин</div>
                         <input type="text" name="username" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
                     </div>
-                    <div>
+                    <div className="handler">
                         <div>Пароль</div>
                         <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^\w\s]).{6,}"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
@@ -52,30 +52,31 @@ const Login = () => {
             </div>
             <div className="LogDialog" id="Authorize">
                 <h2>Авторизоваться</h2>
-                <div>
-                    <div>
+                <div className="form">
+                    <div className="handler">
                         <div>Имя</div>
                         <input type="text" name="name" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
                     </div>
-                    <div>
+                    <div className="handler">
                         <div>Фамилия</div>
                         <input type="text" name="surname" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
                     </div>
-                    <div>
+                    <div className="handler">
                         <div>Логин</div>
                         <input type="text" name="username"></input>
                     </div>
-                    <div>
+                    <div className="handler">
                         <div>Пароль</div>
                         <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^\w\s]).{6,}"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
                     </div>
-                    <div>
+                    <div className="handler">
                         <div>Староста?</div>
                         <input type="checkbox" name="is_admin" value={true}></input>
                     </div>
                     <button onClick={clickAuthorize}> Войти </button>
                 </div>
+                <div className="message" id="LogMessage"></div>
             </div>
             
         </div>

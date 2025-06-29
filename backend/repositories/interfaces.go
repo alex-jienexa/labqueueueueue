@@ -31,12 +31,6 @@ type QueueRepository interface {
 	// Если в данной позиции уже имеется элемент, то он становится прямо за ним.
 	MoveAndFree(entry *models.QueueEntry, position int) error
 
-	// Создаёт и вставляет новый элемент в очереди в позицию position.
-	// Если position == 0, то элемент вставляется в первый свободный слот очереди.
-	// Если position попадает на занятый элемент, то вместо этого вставится в первый свободный
-	// элемент очереди после.
-	//TODO: InsertToNextFree(queueEntry *models.QueueEntry, position int) error
-
 	// Проверяет, занята ли позиция position в очереди queueID.
 	IsPositionBusy(queueID int, position int) (bool, error)
 	// Перепроверяет все элементы очереди и назначает IsActive = true для тех,
@@ -55,4 +49,20 @@ type QueueEntryRepository interface {
 	// Добавляет элемент в очередь. Позиция элемента зависит от значения queueEntry.Position.
 	// Если queueEntry.Position == 0, то элемент добавляется в первый свободный слот очереди
 	AddToQueue(queueEntry *models.QueueEntry, queueRepo queueRepository) error
+}
+
+type StudentQueueAccessRepository interface {
+	Create(studentQueueAccess *models.StudentQueueAccess) error
+	GetByStudent(studentEntry *models.Student) (*models.StudentQueueAccess, error)
+	// Получает access для всех студентов в очереди
+	GetByQueue(queueEntry *models.Queue) ([]models.StudentQueueAccess, error)
+
+	// Обновляет доступ к очереди согласно данным из queueEntry.
+	// До времени записи читать и писать запрещено.
+	// Во время записи можно и читать, и писать.
+	// После времени записи можно читать, но не писать.
+	UpdateByQueueState(queueEntry *models.QueueEntry) error
+
+	// Устанавливает значения флагов для конкретного студента в конкретной очереди
+	SetFlags(accessEntry *models.StudentQueueAccess, canRead, canWrite bool) error
 }

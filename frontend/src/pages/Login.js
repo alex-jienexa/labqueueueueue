@@ -1,13 +1,28 @@
 import "../styles/login.css"
 import { useState } from "react";
-import {clickLogin, clickAuthorize} from "../scripts/click"
+import {clickLogin, clickAuthorize} from "../scripts/click";
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 
     const [selectedOption, setSelectedOption] = useState('option1');
 
+    const navigate = useNavigate();
+
     const handleOptionChange = (changeEvent) => {
         setSelectedOption(changeEvent.target.value);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        
+        try{
+            const response = await clickLogin();
+            navigate('/home');
+        }
+        catch (error){
+            throw new Error(error);
+        };
     };
 
     return (
@@ -47,7 +62,7 @@ const Login = () => {
                         <input type="password" name="password"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
                     </div>
-                    <button onClick={clickLogin}> Войти </button>
+                    <button onClick={handleSubmit}> Войти </button>
                 </div>
             </div>
             <div className="LogDialog" id="Authorize">

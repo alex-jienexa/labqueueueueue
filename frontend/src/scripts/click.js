@@ -1,6 +1,9 @@
-import {postAuthorize, postLogin} from "../api/api"
+import {postAuthorize, postLogin} from "../api/api";
+
+
 
 export async function clickLogin(){
+
     let loginPage = document.getElementById("LogIn");
     let inputs = Array.from(loginPage.getElementsByTagName('input'));
 
@@ -14,8 +17,10 @@ export async function clickLogin(){
         data[element.name] = element.value;
 
     };
-    console.log(data);
-    await postLogin(JSON.stringify(data));
+    const responce = await postLogin(JSON.stringify(data));
+    console.log(responce.data);
+    return responce;
+ 
 }
 
 export async function clickAuthorize(){

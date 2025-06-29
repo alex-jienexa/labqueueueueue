@@ -128,3 +128,41 @@ func GetAllQueues(c *gin.Context, queueRepo repositories.QueueRepository) {
 		c.JSON(http.StatusOK, queues)
 	}
 }
+
+func ResolveConflict(c *gin.Context, queueRepo repositories.QueueRepository, queueEntryRepo repositories.QueueEntryRepository) {
+	var input struct {
+		LoserID int `json:"loser_id"`
+		QueueID int `json:"queue_id"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+	loser, err := queueEntryRepo.GetByID(input.LoserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+	queue, err := queueRepo.GetByID(input.QueueID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+	if err := queueRepo.ResolveConflict(loser, queue); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Конфликт разрешен",
+		"loser":   loser,
+	})
+}

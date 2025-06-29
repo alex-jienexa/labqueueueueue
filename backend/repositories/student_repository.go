@@ -18,7 +18,7 @@ func NewStudentRepository(db *sql.DB) StudentRepository {
 func (r *studentRepository) Create(student *models.Student) error {
 	query := `
 		INSERT INTO students (name, surname, username, password_hash, is_admin)
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
 	`
 	err := r.db.QueryRow(

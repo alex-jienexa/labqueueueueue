@@ -1,0 +1,37 @@
+input:focus {
+  outline: none;
+}
+
+input:invalid{
+    border: 2px solid purple;
+}
+
+.erol{
+    display: none;
+}
+
+[type="password"]:invalid + .erol{
+   display: block;
+   font-size: 8px;
+   color: purple;
+}
+
+[type="radio"]{
+    display: none;
+}
+
+label:hover{
+    cursor: pointer;
+}
+
+.LogDialog{
+    display: none;
+}
+
+.RadioHandle:has(#log_radio:checked) ~ #LogIn{
+    display: block;
+}
+
+.RadioHandle:has(#auth_radio:checked) ~ #Authorize{
+    display: block;
+}

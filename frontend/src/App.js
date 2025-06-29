@@ -1,5 +1,6 @@
-import {BrowserRouter, Navigate, Route, Routes, Router, useLocation, useNavigate} from "react-router-dom";
+import {BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import './App.css';
+import { fetchCurriencies } from "./api/api";
 
 import Login from "./pages/Login"
 import Home from "./pages/Home"
@@ -28,13 +29,15 @@ function AppContext() {
     if (!checkObj(ROUTES, location.pathname)) {
       navigate(-1);
     }
-  });
+    //fetchCurriencies();
+  }, []);
 
 
   return (
     <div className="App">
       <div>
         <Routes>
+          <Route path="/" element={<Navigate replace to={ROUTES.LOGIN} />} />
           <Route exec path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route path={ROUTES.QINFO} element={<Queue />} />

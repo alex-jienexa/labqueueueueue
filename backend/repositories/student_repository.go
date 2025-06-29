@@ -63,6 +63,7 @@ func (r *studentRepository) GetByUsername(username string) (*models.Student, err
 		&student.ID,
 		&student.Name,
 		&student.Surname,
+		&student.Username,
 		&student.Password,
 		&student.IsAdmin,
 	)

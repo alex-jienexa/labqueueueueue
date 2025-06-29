@@ -5,6 +5,7 @@ import (
 
 	"github.com/alex-jienexa/labqueueueueue/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -16,14 +17,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := auth.ParseToken(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный JWT-токен"})
-			c.Abort()
+		claims := &auth.Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			return auth.GetSecretKey(), nil
+		})
+
+		if err != nil || !token.Valid {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Невалидный токен"})
 			return
 		}
 
-		c.Set("user_id", claims.UserID)
+		c.Set("user", claims)
 		c.Next()
 	}
 }

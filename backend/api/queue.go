@@ -2,14 +2,25 @@ package api
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
+	"github.com/alex-jienexa/labqueueueueue/auth"
 	"github.com/alex-jienexa/labqueueueueue/models"
 	"github.com/alex-jienexa/labqueueueueue/repositories"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateQueue(c *gin.Context, queueRepo repositories.QueueRepository, studRepo repositories.StudentRepository) {
-	userID := c.MustGet("userId").(int)
+	claims, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Данные пользователя не найдены"})
+		return
+	}
+
+	userClaims := claims.(*auth.Claims) // Приводим к типу Claims
+	userID := userClaims.UserID
 
 	student, err := studRepo.GetByID(userID)
 	if err != nil {
@@ -51,12 +62,8 @@ func CreateQueue(c *gin.Context, queueRepo repositories.QueueRepository, studRep
 		return
 	}
 
-	// Задать isActive в зависимости от времени начала и окончания
-	if queue.StartsAt.Before(queue.EndsAt) {
-		queue.IsActive = true
-	} else {
-		queue.IsActive = false
-	}
+	currentTime := time.Now()
+	queue.IsActive = currentTime.After(queue.StartsAt) && currentTime.Before(queue.EndsAt)
 
 	if err := queueRepo.Create(&queue); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -89,4 +96,35 @@ func GetActiveQueue(c *gin.Context, queueRepo repositories.QueueRepository) {
 	c.JSON(http.StatusOK, gin.H{
 		"queue": queue,
 	})
+}
+
+func GetQueueByID(c *gin.Context, queueRepo repositories.QueueRepository) {
+	// Получить id из из параметров в URL
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Неправильный формат ID"})
+		return
+	}
+
+	queue, err := queueRepo.GetByID(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Очередь не найдена"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при получении очереди"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, queue)
+}
+
+func GetAllQueues(c *gin.Context, queueRepo repositories.QueueRepository) {
+	if queues, err := queueRepo.GetAll(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Ошибка при получении всех очередей",
+		})
+	} else {
+		c.JSON(http.StatusOK, queues)
+	}
 }

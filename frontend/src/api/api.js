@@ -4,14 +4,8 @@ const BASE_API_URL = "http://localhost:8080";
 
 const BREAKPOINTS = {
     PING: "/ping",
-}
-
-const API_METHODS = 
-{
-    GET: "GET",
-    POST: "POST",
-    PUT: "PUT",
-    DELETE: "DELETE",
+    LOGIN: "/login",
+    REGISTER: "/register",
 }
 
 
@@ -21,6 +15,14 @@ export const fetchCurriencies = async () => {
     })
 }
 
-export const postLogin = () => {
+export async function postLogin(data) {
+    await axios.post(BASE_API_URL + BREAKPOINTS.LOGIN, data, {headers: {
+        'Content-Type': 'application/json'
+    }}).then(response => {console.log(response)});
+}
 
+export async function postAuthorize(data) {
+    await axios.post(BASE_API_URL + BREAKPOINTS.REGISTER, data, {headers: {
+        'Content-Type': 'application/json'
+    }}).then(response => {console.log(response)});
 }

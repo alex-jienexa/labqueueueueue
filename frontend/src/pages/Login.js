@@ -1,5 +1,6 @@
 import "../styles/login.css"
 import { useState } from "react";
+import {clickLogin, clickAuthorize} from "../scripts/click"
 
 const Login = () => {
 
@@ -36,7 +37,7 @@ const Login = () => {
             <div className="LogDialog" id="LogIn">
                 <h2>Войти в систему</h2>
                 
-                <form method="post" action="http://localhost:8080/login">
+                <div>
                     <div>
                         <div>Логин</div>
                         <input type="text" name="username" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
@@ -46,12 +47,12 @@ const Login = () => {
                         <input type="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^\w\s]).{6,}"></input>
                         <div className="erol">"Пароль от 6 символов. Содержит: цифру, спец. символ, строчный и прописной символ латиницы"</div>
                     </div>
-                    <button> Войти </button>
-                </form>
+                    <button onClick={clickLogin}> Войти </button>
+                </div>
             </div>
             <div className="LogDialog" id="Authorize">
                 <h2>Авторизоваться</h2>
-                <form method="post" action="http://localhost:8080/register">
+                <div>
                     <div>
                         <div>Имя</div>
                         <input type="text" name="name" pattern="^[A-Za-zА-Яа-яЁё\-\s]+$"></input>
@@ -73,8 +74,8 @@ const Login = () => {
                         <div>Староста?</div>
                         <input type="checkbox" name="is_admin" value={true}></input>
                     </div>
-                    <button> Войти </button>
-                </form>
+                    <button onClick={clickAuthorize}> Войти </button>
+                </div>
             </div>
             
         </div>

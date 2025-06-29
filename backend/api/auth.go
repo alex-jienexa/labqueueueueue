@@ -51,8 +51,13 @@ func Login(c *gin.Context, repo repositories.StudentRepository) {
 
 	// Проверяем пароль
 	if err := bcrypt.CompareHashAndPassword([]byte(student.Password), []byte(input.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный логин/пароль"})
-		return
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный логин/пароль"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
 	}
 
 	token, err := auth.GenerateToken(student.ID)

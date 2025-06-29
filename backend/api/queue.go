@@ -113,3 +113,13 @@ func GetQueueByID(c *gin.Context, queueRepo repositories.QueueRepository) {
 
 	c.JSON(http.StatusOK, queue)
 }
+
+func GetAllQueues(c *gin.Context, queueRepo repositories.QueueRepository) {
+	if queues, err := queueRepo.GetAll(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Ошибка при получении всех очередей",
+		})
+	} else {
+		c.JSON(http.StatusOK, queues)
+	}
+}

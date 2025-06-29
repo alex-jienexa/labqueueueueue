@@ -13,6 +13,7 @@ type QueueRepository interface {
 	Create(queue *models.Queue) error
 	GetActive() (*models.Queue, error)
 	GetEntries(queueID int) ([]models.QueueEntry, error)
+	GetByID(queueID int) (*models.Queue, error)
 
 	//! Вставка элементов в очередь
 

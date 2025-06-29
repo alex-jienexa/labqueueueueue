@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/alex-jienexa/labqueueueueue/models"
 	"github.com/alex-jienexa/labqueueueueue/repositories"
@@ -89,4 +91,25 @@ func GetActiveQueue(c *gin.Context, queueRepo repositories.QueueRepository) {
 	c.JSON(http.StatusOK, gin.H{
 		"queue": queue,
 	})
+}
+
+func GetQueueByID(c *gin.Context, queueRepo repositories.QueueRepository) {
+	// Получить id из из параметров в URL
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Неправильный формат ID"})
+		return
+	}
+
+	queue, err := queueRepo.GetByID(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Очередь не найдена"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при получении очереди"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, queue)
 }

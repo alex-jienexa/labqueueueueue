@@ -59,6 +59,27 @@ func (r *queueRepository) GetActive() (*models.Queue, error) {
 	return queue, err
 }
 
+// Получает очередь по его ID
+func (r *queueRepository) GetByID(id int) (*models.Queue, error) {
+	query := `
+		SELECT id, admin_id, title, is_active, starts_at, ends_at, conflict_resolution_method, created_at
+		FROM queues
+		WHERE id = $1
+	`
+	queue := &models.Queue{}
+	err := r.db.QueryRow(query, id).Scan(
+		&queue.ID,
+		&queue.AdminID,
+		&queue.Title,
+		&queue.IsActive,
+		&queue.StartsAt,
+		&queue.EndsAt,
+		&queue.ResolutionMethod,
+		&queue.CreatedAt,
+	)
+	return queue, err
+}
+
 // Получение всех записей в очередь QueueEntry для очереди Queue с ID `queueID`
 func (r *queueRepository) GetEntries(queueID int) ([]models.QueueEntry, error) {
 	query := `

@@ -4,14 +4,23 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/alex-jienexa/labqueueueueue/auth"
 	"github.com/alex-jienexa/labqueueueueue/models"
 	"github.com/alex-jienexa/labqueueueueue/repositories"
 	"github.com/gin-gonic/gin"
 )
 
 func CreateQueue(c *gin.Context, queueRepo repositories.QueueRepository, studRepo repositories.StudentRepository) {
-	userID := c.MustGet("userId").(int)
+	claims, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Данные пользователя не найдены"})
+		return
+	}
+
+	userClaims := claims.(*auth.Claims) // Приводим к типу Claims
+	userID := userClaims.UserID
 
 	student, err := studRepo.GetByID(userID)
 	if err != nil {
@@ -53,12 +62,8 @@ func CreateQueue(c *gin.Context, queueRepo repositories.QueueRepository, studRep
 		return
 	}
 
-	// Задать isActive в зависимости от времени начала и окончания
-	if queue.StartsAt.Before(queue.EndsAt) {
-		queue.IsActive = true
-	} else {
-		queue.IsActive = false
-	}
+	currentTime := time.Now()
+	queue.IsActive = currentTime.After(queue.StartsAt) && currentTime.Before(queue.EndsAt)
 
 	if err := queueRepo.Create(&queue); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
